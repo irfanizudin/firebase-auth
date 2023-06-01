@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import AuthenticationServices
 
 struct LoginView: View {
     @EnvironmentObject var vm: AuthenticationViewModel
@@ -17,29 +18,66 @@ struct LoginView: View {
             if vm.isLoading {
                 ProgressView()
             } else {
-                HStack {
-                   Image("google-logo")
-                        .resizable()
-                        .renderingMode(.template)
-                        .scaledToFit()
-                        .frame(width: 25, height: 25)
-                    
-                    Text("Google Sign In")
-                        .font(.callout)
-                }
-                .foregroundColor(.white)
-                .padding()
-                .background {
-                    RoundedRectangle(cornerRadius: 10, style: .continuous)
-                        .fill(.black)
-                }
-                .overlay {
-                    GoogleSignInButton()
-                        .onTapGesture {
-                            vm.signIn()
+                VStack {
+                    HStack {
+                       Image("google-logo")
+                            .resizable()
+                            .renderingMode(.template)
+                            .scaledToFit()
+                            .frame(width: 25, height: 25)
+                        
+                        Text("Sign In with Google")
+                            .font(.callout)
+                    }
+                    .foregroundColor(.white)
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background {
+                        RoundedRectangle(cornerRadius: 10, style: .continuous)
+                            .fill(.black)
+                    }
+                    .overlay {
+                        GoogleSignInButton()
+                            .onTapGesture {
+                                vm.signIn()
+                            }
+                            .blendMode(.overlay)
+                    }
+
+                    HStack {
+                       Image(systemName: "apple.logo")
+                            .resizable()
+                            .renderingMode(.template)
+                            .scaledToFit()
+                            .frame(width: 25, height: 25)
+                        
+                        Text("Sign In with Apple")
+                            .font(.callout)
+                    }
+                    .foregroundColor(.white)
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background {
+                        RoundedRectangle(cornerRadius: 10, style: .continuous)
+                            .fill(.black)
+                    }
+                    .overlay {
+                        SignInWithAppleButton { request in
+                            
+                            vm.signInWithAppleRequest(request: request)
+                            
+                        } onCompletion: { result in
+                            
+                            vm.signInWithAppleCompletion(result: result)
                         }
+                        .signInWithAppleButtonStyle(.white)
                         .blendMode(.overlay)
+                    }
+                    .padding(.top)
+
+  
                 }
+                .padding(.horizontal, 20)
 
             }
             
@@ -50,5 +88,6 @@ struct LoginView: View {
 struct LoginView_Previews: PreviewProvider {
     static var previews: some View {
         LoginView()
+            .environmentObject(AuthenticationViewModel())
     }
 }

@@ -12,6 +12,7 @@ import FirebaseAuth
 struct HomeView: View {
     @EnvironmentObject var vm: AuthenticationViewModel
     
+    
     let userHome = GIDSignIn.sharedInstance.currentUser
     
     var body: some View {
@@ -31,10 +32,10 @@ struct HomeView: View {
                     .clipShape(Circle())
             }
             
-            Text(userHome?.profile?.name ?? "")
+            Text(userHome?.profile?.name ?? vm.firstName + " " + vm.lastName )
                 .font(.title.bold())
             
-            Text(userHome?.profile?.email ?? "")
+            Text(userHome?.profile?.email ?? vm.email )
                 .font(.body)
                 .foregroundColor(.gray)
             
@@ -55,7 +56,7 @@ struct HomeView: View {
         }
         .padding(.horizontal, 30)
         .onAppear {
-            
+            print(vm.user?.uid ?? "")
         }
     }
 }
