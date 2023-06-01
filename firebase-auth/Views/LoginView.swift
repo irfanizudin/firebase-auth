@@ -39,7 +39,7 @@ struct LoginView: View {
                     .overlay {
                         GoogleSignInButton()
                             .onTapGesture {
-                                vm.signIn()
+                                vm.signInWithGoogle()
                             }
                             .blendMode(.overlay)
                     }

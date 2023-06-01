@@ -20,22 +20,31 @@ struct HomeView: View {
             Text("Welcome 🥰")
                 .font(.largeTitle.bold())
             
-            AsyncImage(url: userHome?.profile?.imageURL(withDimension: 100)) { image in
-                image
+            if vm.user?.photoURL == "" {
+                Image(systemName: "person.circle")
                     .resizable()
                     .scaledToFill()
                     .frame(width: 100, height: 100)
                     .clipShape(Circle())
-            } placeholder: {
-                ProgressView()
-                    .frame(width: 100, height: 100)
-                    .clipShape(Circle())
+            } else {
+                AsyncImage(url: URL(string: vm.user?.photoURL ?? "")) { image in
+                    image
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 100, height: 100)
+                        .clipShape(Circle())
+                } placeholder: {
+                    ProgressView()
+                        .frame(width: 100, height: 100)
+                        .clipShape(Circle())
+                }
+
             }
             
-            Text(userHome?.profile?.name ?? vm.firstName + " " + vm.lastName )
+            Text(vm.user?.fullName ?? "")
                 .font(.title.bold())
             
-            Text(userHome?.profile?.email ?? vm.email )
+            Text(vm.user?.email ?? "")
                 .font(.body)
                 .foregroundColor(.gray)
             
@@ -56,7 +65,7 @@ struct HomeView: View {
         }
         .padding(.horizontal, 30)
         .onAppear {
-            print(vm.user?.uid ?? "")
+            vm.fetchUserData()
         }
     }
 }

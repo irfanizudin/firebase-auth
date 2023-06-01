@@ -10,31 +10,29 @@ import SwiftUI
 import GoogleSignIn
 import AuthenticationServices
 import Firebase
+import FirebaseFirestore
 
 
 class AuthenticationViewModel: ObservableObject {
     
-    @Published var user: User?
+    @Published var checkUser: User?
     @Published var isLoading: Bool = false
     @Published var nonce: String = ""
-    @Published var userApple: UserApple?
+    @Published var user: UserModel?
     
     @AppStorage("isSignedIn") var isSignedIn: Bool = false
-    @AppStorage("id") var id: String = ""
-    @AppStorage("firstName") var firstName: String = ""
-    @AppStorage("lastName") var lastName: String = ""
-    @AppStorage("email") var email: String = ""
 
+    let firestore = Firestore.firestore()
 
     func checkUserStatus() {
-        user = Auth.auth().currentUser
+        checkUser = Auth.auth().currentUser
         
         GIDSignIn.sharedInstance.restorePreviousSignIn { user, error in
             print("has previous signin: ",user as Any)
         }
     }
     
-    func signIn() {
+    func signInWithGoogle() {
                 
             isLoading = true
             guard let clientID = FirebaseApp.app()?.options.clientID else { return }
@@ -48,13 +46,13 @@ class AuthenticationViewModel: ObservableObject {
             else { return }
             
             GIDSignIn.sharedInstance.signIn(withPresenting: rootViewController) { [unowned self] result, error in
-                authenticateUser(user: result?.user, error: error)
+                authenticateGoogleSignIn(user: result?.user, error: error)
 
             }
         
     }
     
-    func authenticateUser(user: GIDGoogleUser?, error: Error?) {
+    func authenticateGoogleSignIn(user: GIDGoogleUser?, error: Error?) {
         if let error = error {
             print(error.localizedDescription)
             isLoading = false
@@ -72,14 +70,22 @@ class AuthenticationViewModel: ObservableObject {
         Auth.auth().signIn(with: credential) { _, error in
             if let error = error {
                 print(error.localizedDescription)
-                print("bb")
 
             } else {
+                self.isLoading = false
 
                 withAnimation(.easeInOut) {
                     self.isSignedIn = true
-                    self.isLoading = false
                 }
+                
+                let uid = user?.userID
+                let fullName = user?.profile?.name
+                let email = user?.profile?.email
+                let photoURL = user?.profile?.imageURL(withDimension: 200)?.absoluteString
+                
+                let user = UserModel(uid: uid, fullName: fullName, email: email, photoURL: photoURL)
+                
+                self.saveUserSignIn(user: user)
             }
         }
     }
@@ -118,20 +124,6 @@ class AuthenticationViewModel: ObservableObject {
     
     func authenticateAppleSignIn(credential: ASAuthorizationAppleIDCredential) {
         
-        let id = credential.user
-        let firstName = credential.fullName?.givenName
-        let lastName = credential.fullName?.familyName
-        let email = credential.email
-        
-        let user = UserApple(id: id, firstName: firstName, lastName: lastName, email: email)
-        userApple = user
-        print(userApple)
-
-        self.id = id
-        self.firstName = firstName ?? ""
-        self.lastName = lastName ?? ""
-        self.email = email ?? ""
-        
         guard let token = credential.identityToken else {
             print("error get token")
             return
@@ -144,6 +136,7 @@ class AuthenticationViewModel: ObservableObject {
         
         let appleCredential = OAuthProvider.credential(withProviderID: "apple.com", idToken: tokenString, rawNonce: nonce)
         
+        
         Auth.auth().signIn(with: appleCredential) { result, error in
             if let error = error {
                 print(error.localizedDescription)
@@ -151,8 +144,88 @@ class AuthenticationViewModel: ObservableObject {
             }
             print("Login Apple success")
             self.isSignedIn = true
+            
+            let uid = credential.user
+            let firstName = credential.fullName?.givenName ?? ""
+            let lastName = credential.fullName?.familyName ?? ""
+            let fullName = "\(firstName) \(lastName)"
+            let email = credential.email
+            
+            let user = UserModel(uid: uid, fullName: fullName, email: email, photoURL: "")
+            
+            self.saveUserSignIn(user: user)
         }
         
+    }
+    
+    func saveUserSignIn(user: UserModel) {
+        guard let userId = Auth.auth().currentUser?.uid else { return }
+                
+        if user.email == nil {
+            updateAppleSignIn(user: user, userId: userId)
+
+        } else {
+            
+            let data: [String: Any] = [
+                "uid": user.uid ?? "",
+                "fullName": user.fullName ?? "",
+                "email": user.email ?? "",
+                "photoURL": user.photoURL ?? "",
+                "createdAt": Timestamp(date: Date()),
+                "updatedAt": Timestamp(date: Date())
+            ]
+            
+            firestore.collection("Users").document(userId).setData(data) { error in
+                if let error = error {
+                    print("error saving data to firestore: ", error.localizedDescription)
+                } else {
+                    print("successfully save data to firestore")
+                }
+            }
+
+        }
+        
+        
+    }
+    
+    func updateAppleSignIn(user: UserModel, userId: String) {
+        let data: [String: Any] = [
+            "uid": user.uid ?? "",
+            "updatedAt": Timestamp(date: Date())
+        ]
+        
+        firestore.collection("Users").document(userId).updateData(data) { error in
+            if let error = error {
+                print("error update Apple SignIn: ", error.localizedDescription)
+            } else {
+                print("Successfully update Apple SignIn")
+            }
+        }
+
+    }
+    
+    func fetchUserData() {
+        guard let userId = Auth.auth().currentUser?.uid else { return }
+        
+        firestore.collection("Users").document(userId).addSnapshotListener { snapshot, error in
+            if let error = error {
+                print("Failed to fetch data: ", error.localizedDescription)
+                return
+            }
+            
+            guard let document = snapshot?.data() else { return }
+            
+            let uid = document["uid"] as? String ?? ""
+            let fullName = document["fullName"] as? String ?? ""
+            let email = document["email"] as? String ?? ""
+            let photoURL = document["photoURL"] as? String ?? ""
+            
+            let user = UserModel(uid: uid, fullName: fullName, email: email, photoURL: photoURL)
+            self.user = user
+            
+            print(user)
+            
+        }
         
     }
     

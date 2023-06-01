@@ -7,16 +7,9 @@
 
 import Foundation
 
-struct UserApple {
-    let id: String?
-    let firstName: String?
-    let lastName: String?
+struct UserModel {
+    let uid: String?
+    let fullName: String?
     let email: String?
-    
-    init(id: String?, firstName: String?, lastName: String?, email: String?) {
-        self.id = id
-        self.firstName = firstName
-        self.lastName = lastName
-        self.email = email
-    }
+    let photoURL: String?
 }
