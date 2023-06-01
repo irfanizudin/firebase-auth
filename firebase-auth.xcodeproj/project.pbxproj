@@ -15,6 +15,10 @@
 		2EE081152A15209F00847919 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 2EE081142A15209F00847919 /* GoogleSignIn */; };
 		2EE081172A15209F00847919 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 2EE081162A15209F00847919 /* GoogleSignInSwift */; };
 		2EE081192A1524C900847919 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 2EE081182A1524C900847919 /* GoogleService-Info.plist */; };
+		2EE0811E2A152A4600847919 /* AuthenticationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EE0811D2A152A4600847919 /* AuthenticationViewModel.swift */; };
+		2EE081202A15330B00847919 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EE0811F2A15330B00847919 /* LoginView.swift */; };
+		2EE081222A15332500847919 /* GoogleSignInButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EE081212A15332500847919 /* GoogleSignInButton.swift */; };
+		2EE081242A1535E700847919 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EE081232A1535E700847919 /* HomeView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +28,11 @@
 		2EE081062A1514DD00847919 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		2EE081092A1514DD00847919 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		2EE081182A1524C900847919 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		2EE0811A2A1529A100847919 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		2EE0811D2A152A4600847919 /* AuthenticationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationViewModel.swift; sourceTree = "<group>"; };
+		2EE0811F2A15330B00847919 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
+		2EE081212A15332500847919 /* GoogleSignInButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleSignInButton.swift; sourceTree = "<group>"; };
+		2EE081232A1535E700847919 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -59,9 +68,11 @@
 		2EE081012A1514DC00847919 /* firebase-auth */ = {
 			isa = PBXGroup;
 			children = (
+				2EE0811C2A152A0D00847919 /* Views */,
+				2EE0811B2A152A0100847919 /* ViewModels */,
+				2EE0811A2A1529A100847919 /* Info.plist */,
 				2EE081182A1524C900847919 /* GoogleService-Info.plist */,
 				2EE081022A1514DC00847919 /* firebase_authApp.swift */,
-				2EE081042A1514DC00847919 /* ContentView.swift */,
 				2EE081062A1514DD00847919 /* Assets.xcassets */,
 				2EE081082A1514DD00847919 /* Preview Content */,
 			);
@@ -74,6 +85,25 @@
 				2EE081092A1514DD00847919 /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		2EE0811B2A152A0100847919 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				2EE0811D2A152A4600847919 /* AuthenticationViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		2EE0811C2A152A0D00847919 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				2EE081042A1514DC00847919 /* ContentView.swift */,
+				2EE0811F2A15330B00847919 /* LoginView.swift */,
+				2EE081212A15332500847919 /* GoogleSignInButton.swift */,
+				2EE081232A1535E700847919 /* HomeView.swift */,
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -156,7 +186,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2EE0811E2A152A4600847919 /* AuthenticationViewModel.swift in Sources */,
 				2EE081052A1514DC00847919 /* ContentView.swift in Sources */,
+				2EE081222A15332500847919 /* GoogleSignInButton.swift in Sources */,
+				2EE081242A1535E700847919 /* HomeView.swift in Sources */,
+				2EE081202A15330B00847919 /* LoginView.swift in Sources */,
 				2EE081032A1514DC00847919 /* firebase_authApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -289,6 +323,7 @@
 				DEVELOPMENT_TEAM = NH9U89BPWK;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "firebase-auth/Info.plist";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -318,6 +353,7 @@
 				DEVELOPMENT_TEAM = NH9U89BPWK;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "firebase-auth/Info.plist";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

@@ -11,10 +11,14 @@ import FirebaseCore
 @main
 struct firebase_authApp: App {
     
+    @StateObject var vm = AuthenticationViewModel()
+    
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     var body: some Scene {
         WindowGroup {
             ContentView()
+//            LoginView()
+                .environmentObject(vm)
         }
     }
 }
