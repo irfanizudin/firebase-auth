@@ -11,6 +11,7 @@ import GoogleSignIn
 import AuthenticationServices
 import Firebase
 import FirebaseFirestore
+import FirebaseStorage
 
 
 class AuthenticationViewModel: ObservableObject {
@@ -19,6 +20,8 @@ class AuthenticationViewModel: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var nonce: String = ""
     @Published var user: UserModel?
+    @Published var showImagePicker: Bool = false
+    @Published var image: UIImage?
     
     @AppStorage("isSignedIn") var isSignedIn: Bool = false
 
@@ -227,6 +230,30 @@ class AuthenticationViewModel: ObservableObject {
             
         }
         
+    }
+    
+    func saveImageToStorage() {
+        
+        let filename = UUID().uuidString
+        let ref = Storage.storage().reference(withPath: filename)
+        
+        guard let imageData = self.image?.jpegData(compressionQuality: 0.5) else { return }
+        
+        ref.putData(imageData) { metadata, error in
+            if let error = error {
+                print("Failed to save image: ", error.localizedDescription)
+                return
+            }
+            
+            ref.downloadURL { url, error in
+                if let error = error {
+                    print("Failed to download URL: ", error.localizedDescription)
+                    return
+                }
+                
+                print("Successfully download URL: ", url?.absoluteString as Any)
+            }
+        }
     }
     
 }
