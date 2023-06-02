@@ -12,9 +12,6 @@ import FirebaseAuth
 struct HomeView: View {
     @EnvironmentObject var vm: AuthenticationViewModel
     
-    
-    let userHome = GIDSignIn.sharedInstance.currentUser
-    
     var body: some View {
         VStack {
             Text("Welcome 🥰")
@@ -89,7 +86,6 @@ struct HomeView: View {
 
             Button {
                 vm.signOut()
-                vm.image = UIImage(named: "")
             } label: {
                 Text("Sign Out")
                     .font(.headline)
@@ -103,12 +99,19 @@ struct HomeView: View {
             .padding(.top, 10)
             
         }
+        .frame(maxHeight: .infinity)
         .padding(.horizontal, 30)
         .onAppear {
             vm.fetchUserData()
         }
         .sheet(isPresented: $vm.showImagePicker) {
             ImagePicker(image: $vm.image)
+        }
+        .alert(vm.alertMessage, isPresented: $vm.showUpdatedPhotoAlert) {
+            Button("OK", action: {})
+        }
+        .overlay {
+            LoadingView(isShowing: $vm.isShowLoading)
         }
     }
 }

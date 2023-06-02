@@ -22,14 +22,12 @@ struct ContentView: View {
             }
 
         }
-        .onAppear {
-            vm.checkUserStatus()
-        }
     }
 }
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
+            .environmentObject(AuthenticationViewModel())
     }
 }

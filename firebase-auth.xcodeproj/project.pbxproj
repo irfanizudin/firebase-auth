@@ -24,6 +24,7 @@
 		2EE081242A1535E700847919 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EE081232A1535E700847919 /* HomeView.swift */; };
 		2EF94A6F2A2981AD00C8E932 /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EF94A6E2A2981AD00C8E932 /* ImagePicker.swift */; };
 		2EF94A712A298BFC00C8E932 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 2EF94A702A298BFC00C8E932 /* FirebaseStorage */; };
+		2EF94A732A29C4AF00C8E932 /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EF94A722A29C4AF00C8E932 /* LoadingView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -42,6 +43,7 @@
 		2EE081212A15332500847919 /* GoogleSignInButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleSignInButton.swift; sourceTree = "<group>"; };
 		2EE081232A1535E700847919 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		2EF94A6E2A2981AD00C8E932 /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
+		2EF94A722A29C4AF00C8E932 /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -65,6 +67,7 @@
 			children = (
 				2E8B70D62A2858E60075B0F0 /* Auth.swift */,
 				2EF94A6E2A2981AD00C8E932 /* ImagePicker.swift */,
+				2EF94A722A29C4AF00C8E932 /* LoadingView.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -230,6 +233,7 @@
 				2EE0811E2A152A4600847919 /* AuthenticationViewModel.swift in Sources */,
 				2EE081052A1514DC00847919 /* ContentView.swift in Sources */,
 				2EE081222A15332500847919 /* GoogleSignInButton.swift in Sources */,
+				2EF94A732A29C4AF00C8E932 /* LoadingView.swift in Sources */,
 				2EF94A6F2A2981AD00C8E932 /* ImagePicker.swift in Sources */,
 				2EE081242A1535E700847919 /* HomeView.swift in Sources */,
 				2E9213562A28658F000E2212 /* User.swift in Sources */,

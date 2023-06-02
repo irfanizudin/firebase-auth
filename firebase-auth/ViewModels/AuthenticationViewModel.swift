@@ -16,24 +16,18 @@ import FirebaseStorage
 
 class AuthenticationViewModel: ObservableObject {
     
-    @Published var checkUser: User?
     @Published var isLoading: Bool = false
     @Published var nonce: String = ""
     @Published var user: UserModel?
     @Published var showImagePicker: Bool = false
     @Published var image: UIImage?
+    @Published var showUpdatedPhotoAlert: Bool = false
+    @Published var alertMessage: String = ""
+    @Published var isShowLoading: Bool = false
     
     @AppStorage("isSignedIn") var isSignedIn: Bool = false
 
     let firestore = Firestore.firestore()
-
-    func checkUserStatus() {
-        checkUser = Auth.auth().currentUser
-        
-        GIDSignIn.sharedInstance.restorePreviousSignIn { user, error in
-            print("has previous signin: ",user as Any)
-        }
-    }
     
     func signInWithGoogle() {
                 
@@ -87,18 +81,20 @@ class AuthenticationViewModel: ObservableObject {
                 let photoURL = user?.profile?.imageURL(withDimension: 200)?.absoluteString
                 
                 let user = UserModel(uid: uid, fullName: fullName, email: email, photoURL: photoURL)
-                
+                                
                 self.saveUserSignIn(user: user)
             }
         }
     }
-    
+        
     func signOut() {
         GIDSignIn.sharedInstance.signOut()
         isSignedIn = false
 
         do {
             try Auth.auth().signOut()
+            self.image = UIImage(named: "")
+
         } catch {
             print(error.localizedDescription)
         }
@@ -163,31 +159,43 @@ class AuthenticationViewModel: ObservableObject {
     
     func saveUserSignIn(user: UserModel) {
         guard let userId = Auth.auth().currentUser?.uid else { return }
+        
+        firestore.collection("Users").document(userId).getDocument { document, error in
+            if let document = document, document.exists {
+                print("update data")
                 
-        if user.email == nil {
-            updateAppleSignIn(user: user, userId: userId)
+            } else {
+                print("save data")
+                
+                if user.email == nil {
+                    self.updateAppleSignIn(user: user, userId: userId)
 
-        } else {
-            
-            let data: [String: Any] = [
-                "uid": user.uid ?? "",
-                "fullName": user.fullName ?? "",
-                "email": user.email ?? "",
-                "photoURL": user.photoURL ?? "",
-                "createdAt": Timestamp(date: Date()),
-                "updatedAt": Timestamp(date: Date())
-            ]
-            
-            firestore.collection("Users").document(userId).setData(data) { error in
-                if let error = error {
-                    print("error saving data to firestore: ", error.localizedDescription)
                 } else {
-                    print("successfully save data to firestore")
-                }
-            }
+                    
+                    let data: [String: Any] = [
+                        "uid": user.uid ?? "",
+                        "fullName": user.fullName ?? "",
+                        "email": user.email ?? "",
+                        "photoURL": user.photoURL ?? "",
+                        "createdAt": Timestamp(date: Date()),
+                        "updatedAt": Timestamp(date: Date())
+                    ]
+                    
+                    self.firestore.collection("Users").document(userId).setData(data) { error in
+                        if let error = error {
+                            print("error saving data to firestore: ", error.localizedDescription)
+                        } else {
+                            print("successfully save data to firestore")
+                        }
+                    }
 
+                }
+
+                
+            }
         }
         
+                
         
     }
     
@@ -226,7 +234,6 @@ class AuthenticationViewModel: ObservableObject {
             let user = UserModel(uid: uid, fullName: fullName, email: email, photoURL: photoURL)
             self.user = user
             
-            print(user)
             
         }
         
@@ -234,6 +241,7 @@ class AuthenticationViewModel: ObservableObject {
     
     func saveImageToStorage() {
         
+        self.isShowLoading = true
         let filename = UUID().uuidString
         let ref = Storage.storage().reference(withPath: filename)
         
@@ -251,9 +259,40 @@ class AuthenticationViewModel: ObservableObject {
                     return
                 }
                 
-                print("Successfully download URL: ", url?.absoluteString as Any)
+                self.updatePhotoProfile(photoURL: url?.absoluteString ?? "")
+
             }
         }
+    }
+    
+    func updatePhotoProfile(photoURL: String) {
+        
+        guard let userId = Auth.auth().currentUser?.uid else { return }
+        
+        let data: [String: Any] = [
+            "photoURL": photoURL,
+            "updatedAt": Timestamp(date: Date())
+        ]
+        
+        firestore.collection("Users").document(userId).updateData(data) { error in
+            if let error = error {
+                print("Failed update photo profile: ", error.localizedDescription)
+                self.alertMessage = "Failed update photo profile"
+                self.isShowLoading = false
+                self.image = UIImage(named: "")
+
+            } else {
+                self.alertMessage = "Successfully update photo profile"
+                print("Successfully update photo profile")
+                self.isShowLoading = false
+                self.image = UIImage(named: "")
+
+            }
+            
+            self.showUpdatedPhotoAlert = true
+
+        }
+
     }
     
 }
