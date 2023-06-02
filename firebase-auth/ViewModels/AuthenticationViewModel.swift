@@ -80,7 +80,7 @@ class AuthenticationViewModel: ObservableObject {
                 let email = user?.profile?.email
                 let photoURL = user?.profile?.imageURL(withDimension: 200)?.absoluteString
                 
-                let user = UserModel(uid: uid, fullName: fullName, email: email, photoURL: photoURL)
+                let user = UserModel(uid: uid, fullName: fullName, email: email, photoURL: photoURL, photoName: "")
                                 
                 self.saveUserSignIn(user: user)
             }
@@ -150,7 +150,7 @@ class AuthenticationViewModel: ObservableObject {
             let fullName = "\(firstName) \(lastName)"
             let email = credential.email
             
-            let user = UserModel(uid: uid, fullName: fullName, email: email, photoURL: "")
+            let user = UserModel(uid: uid, fullName: fullName, email: email, photoURL: "", photoName: "")
             
             self.saveUserSignIn(user: user)
         }
@@ -177,6 +177,7 @@ class AuthenticationViewModel: ObservableObject {
                         "fullName": user.fullName ?? "",
                         "email": user.email ?? "",
                         "photoURL": user.photoURL ?? "",
+                        "photoName": "",
                         "createdAt": Timestamp(date: Date()),
                         "updatedAt": Timestamp(date: Date())
                     ]
@@ -230,8 +231,9 @@ class AuthenticationViewModel: ObservableObject {
             let fullName = document["fullName"] as? String ?? ""
             let email = document["email"] as? String ?? ""
             let photoURL = document["photoURL"] as? String ?? ""
+            let photoName = document["photoName"] as? String ?? ""
             
-            let user = UserModel(uid: uid, fullName: fullName, email: email, photoURL: photoURL)
+            let user = UserModel(uid: uid, fullName: fullName, email: email, photoURL: photoURL, photoName: photoName)
             self.user = user
             
             
@@ -240,6 +242,8 @@ class AuthenticationViewModel: ObservableObject {
     }
     
     func saveImageToStorage() {
+        
+        self.deleteImageFromStorage()
         
         self.isShowLoading = true
         let filename = UUID().uuidString
@@ -259,18 +263,19 @@ class AuthenticationViewModel: ObservableObject {
                     return
                 }
                 
-                self.updatePhotoProfile(photoURL: url?.absoluteString ?? "")
+                self.updatePhotoProfile(photoURL: url?.absoluteString ?? "", photoName: filename)
 
             }
         }
     }
     
-    func updatePhotoProfile(photoURL: String) {
+    func updatePhotoProfile(photoURL: String, photoName: String) {
         
         guard let userId = Auth.auth().currentUser?.uid else { return }
         
         let data: [String: Any] = [
             "photoURL": photoURL,
+            "photoName": photoName,
             "updatedAt": Timestamp(date: Date())
         ]
         
@@ -293,6 +298,38 @@ class AuthenticationViewModel: ObservableObject {
 
         }
 
+    }
+    
+    func deleteImageFromStorage() {
+        guard let userId = Auth.auth().currentUser?.uid else { return }
+
+        firestore.collection("Users").document(userId).getDocument { document, error in
+            if let error = error {
+                print("Failed to get document :", error.localizedDescription)
+                return
+            }
+            
+            guard let document = document?.data() else { return }
+            let photoName = document["photoName"] as? String ?? ""
+            if !photoName.isEmpty {
+                print("photo name exist")
+                
+                let ref = Storage.storage().reference().child(photoName)
+                
+                ref.delete { error in
+                    if let error = error {
+                        print("Failed to delete image", error.localizedDescription)
+                    } else {
+                        print("Successfully delete image")
+                    }
+                }
+            } else {
+                print("photo name empty")
+            }
+            
+
+        }
+        
     }
     
 }

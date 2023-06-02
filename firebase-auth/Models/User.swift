@@ -12,4 +12,5 @@ struct UserModel {
     let fullName: String?
     let email: String?
     let photoURL: String?
+    let photoName: String?
 }
